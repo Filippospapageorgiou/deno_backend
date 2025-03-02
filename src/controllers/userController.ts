@@ -82,7 +82,8 @@ export const userController = {
                     token,
                     user: {
                         id: user.id,
-                        email: user.email
+                        email: user.email,
+                        role: user.role
                     }
                 },
                 timestamp: new Date().toISOString()
@@ -190,6 +191,7 @@ export const userController = {
             const userData: NewUser = {
                 email: body.email,
                 password: hashedPassword,
+                role: body.role || 'user',
                 createdAt: new Date(),
                 updatedAt: new Date()
             };

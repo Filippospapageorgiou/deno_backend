@@ -4,7 +4,7 @@ import { apiRouter } from "./routes/routes.ts";
 const app = new Hono();
 
 // Mount all API routes under /api/v1
-app.route("/api/v1", apiRouter);
+app.route("", apiRouter);
 
 // Start the server
 const port = parseInt(Deno.env.get("PORT") || "3000");

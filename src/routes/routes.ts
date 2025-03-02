@@ -6,15 +6,15 @@ import { authMiddleware } from "../middleware/auth.ts";
 const publicRoutes = new Hono()
   .get("/health", (c) => c.json({ status: "OK", timestamp: new Date().toISOString() }))
   .post("/auth/login", userController.login)
-  .post("/auth/register", userController.register);
 
-// Protected routes
+
 const protectedRoutes = new Hono()
-  .use("*", authMiddleware) // Protect all routes under this router
+  .use("*", authMiddleware) 
   .post("/deleteUser",userController.delete)
+  .post("/auth/register", userController.register)
   .get("/users", userController.getAllUsers);
 
-// Create and export the main API router
+
 export const apiRouter = new Hono()
-  .route("/public", publicRoutes)  // Mount public routes under /public
-  .route("/", protectedRoutes);    // Mount protected routes at root level
+  .route("/public", publicRoutes)  
+  .route("/", protectedRoutes);

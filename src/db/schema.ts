@@ -8,4 +8,5 @@ export const users = mysqlTable("users", {
     password: varchar({ length: 256 }),
     createdAt: timestamp("created_at", { mode: 'date' }),
     updatedAt: timestamp("updated_at", { mode: 'date' }),
+    role: varchar({ length: 54 }),
 });
