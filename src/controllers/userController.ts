@@ -18,7 +18,8 @@ const ERROR_MESSAGES = {
     INVALID_CREDENTIALS: "Invalid credentials",
     SERVER_ERROR: "An unexpected error occurred",
     USER_NOT_FOUND: "User not found",
-    EMAIL_EXISTS: "Email already registered"
+    EMAIL_EXISTS: "Email already registered",
+    ACCESS_DENIED : "Access denied for action"
 } as const;
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -27,11 +28,19 @@ export const userController = {
     // Protected route - Get all users
     getAllUsers: async (c: Context) => {
         try {
+            const user = {
+                userId:c.get("userId"),
+                userRole:c.get("userRole"),
+                email:c.get("email")           
+            }
+
+            
             const data = await UserModel.findAll();
             return c.json({
                 success: true,
                 data,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                actionUser: user
             });
         } catch (error: unknown) {
             const errorMessage = error instanceof Error 
@@ -73,8 +82,8 @@ export const userController = {
                     error: ERROR_MESSAGES.INVALID_CREDENTIALS
                 }, 401);
             }
-
-            const token = await generateToken(user.id);
+            const role = user.role || 'user';
+            const token = await generateToken(user.id,role,user.email || "");
 
             return c.json({
                 success: true,
@@ -145,6 +154,16 @@ export const userController = {
 
     // Public route - Register
     register: async (c: Context) => {
+
+        const userId = c.get("userId");
+        const userRole = c.get("userRole");
+        if(userRole != 'admin'){
+            return c.json({
+                success: false,
+                error: ERROR_MESSAGES.ACCESS_DENIED
+            },400)
+        }
+
         try {
             const data = await c.req.json();
             
@@ -203,7 +222,8 @@ export const userController = {
                 data: {
                     id: result,
                     email: userData.email,
-                    createdAt: userData.createdAt
+                    createdAt: userData.createdAt,
+                    role: userData.role
                 },
                 timestamp: new Date().toISOString()
             }, 201);

@@ -15,9 +15,11 @@ async function getCryptoKey(secret: string): Promise<CryptoKey> {
     );
 }
 
-export async function generateToken(userId: number): Promise<string> {
+export async function generateToken(userId: number, role:string, email: string): Promise<string> {
     const payload = {
         userId,
+        role,
+        email,
         exp: new Date().getTime() + 24 * 60 * 60 * 1000 // 24 hours
     };
     
@@ -48,6 +50,8 @@ export async function authMiddleware(c: Context, next: Next) {
         }
 
         c.set("userId", payload.userId);
+        c.set("userRole",payload.role);
+        c.set("email",payload?.email || "");
         await next();
     } catch (error) {
         return c.json({ 
